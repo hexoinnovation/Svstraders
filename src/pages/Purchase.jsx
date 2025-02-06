@@ -77,7 +77,13 @@ const Purchase = () => {
       const userDocRef = doc(db, "admins", user.email);
       const productsRef = collection(userDocRef, "Purchase");
 
-      await setDoc(doc(productsRef, newProduct.phone), newProduct);
+      if (!newProduct.no) {
+        newProduct.no = Date.now().toString(); // Unique ID based on timestamp
+          }
+      
+          const productDocRef = doc(productsRef, newProduct.no);
+      
+          await setDoc(productDocRef, newProduct, { merge: true });
 
       setProducts((prev) => [...prev, newProduct]);
       Swal.fire("Success", "Product added successfully!", "success");
