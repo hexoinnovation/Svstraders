@@ -40,6 +40,7 @@ import Profile from "./Components/profile";
 import Hrmdashboard from "./pages/hrmdashboard";
 import Invoicedashboard from "./pages/invoicedashboard";
 import Endproduct from "./pages/endproduct";
+import Rawmaterials from "./pages/rawmaterials";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -126,6 +127,12 @@ const App = () => {
               <Route
                 path="/purchase"
                 element={isAuthenticated ? <Purchase /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/rawmaterials"
+                element={
+                  isAuthenticated ? <Rawmaterials /> : <Navigate to="/" />
+                }
               />
               <Route
                 path="/invoice"

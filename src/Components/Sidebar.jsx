@@ -53,6 +53,17 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
           </Link>
         </li>
 
+        {/* Raw Materials Stock Menu */}
+        <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+          <Link
+            to="/rawmaterials"
+            onClick={() => handleLinkClick("rawmaterials")}
+          >
+            <i className="bx bxs-cube text-xl"></i>
+            <span className="text-lg ml-2">Raw Materials Stock</span>
+          </Link>
+        </li>
+
         <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link to="/sales" onClick={() => handleLinkClick("sales")}>
             <i className="bx bxs-cart-alt text-xl"></i>
