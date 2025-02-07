@@ -125,7 +125,7 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
         </li>
 
         {/* Logout */}
-        <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+        {/* <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link
             to="#"
             onClick={() => {
@@ -137,15 +137,15 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
             <i className="bx bx-log-out text-xl"></i>
             <span className="ml-2 font-extrabold text-lg">Logout</span>
           </Link>
-        </li>
+        </li> */}
 
         {/* Help */}
-        <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+        {/* <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link to="/help">
             <i className="bx bxs-help-circle text-xl"></i>
             <span className="text-lg ml-2">Help</span>
           </Link>
-        </li>
+        </li> */}
       </ul>
     </section>
   );
