@@ -1095,7 +1095,8 @@ const Invoice = () => {
                   onChange={handleBusinessChange}
                   className=" print:hidden w-full px-4 py-2 border-2 border-indigo-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="#">Select Business</option>
+                  <p>Select Business</p>
+                  {/* <option >Select Business</option> */}
                   {businessList.map((business) => (
                     <option key={business.id} value={business.id}>
                       {business.businessName}
@@ -1236,7 +1237,8 @@ const Invoice = () => {
                   onChange={handleCustomerChange}
                   className=" print:hidden w-full px-4 py-2 border-2 border-indigo-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="">Select Customer</option>
+              <p>Select Customer</p>
+                 
                   {customerList.map((customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.name}
