@@ -6,7 +6,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
-  setDoc,
+  setDoc,getDoc
 } from "firebase/firestore";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { FaChartLine } from "react-icons/fa";
@@ -79,37 +79,56 @@ const Stocks = () => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+ 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-    if (!user) {
-      alert("Please log in to add or update a product.");
-      return;
-    }
-
+    if (!user) return;
+  
     try {
       const userDocRef = doc(db, "admins", user.email);
-      const productsRef = collection(userDocRef, "Stocks");
-
+      const productsRef = collection(userDocRef, "Purchase");
+  
+      // Fetch existing product details (to get the original estock value)
+      let existingProduct = null;
+      if (newStock.no) {
+        const productDocRef = doc(productsRef, newStock.no);
+        const productSnap = await getDoc(productDocRef);
+        if (productSnap.exists()) {
+          existingProduct = productSnap.data();
+        }
+      }
+  
+      // If product exists, calculate new estock value
+      if (existingProduct) {
+        newStock.estock = existingProduct.estock - newStock.cstock;
+      } else {
+        // If new product, ensure estock is set
+        if (!newStock.estock) {
+          newStock.estock = 0;
+        }
+        newStock.estock -= newStock.cstock;
+      }
+  
       // Auto-generate Product No if not set
       if (!newStock.no) {
-        newStock.no = getNextProductNo().toString();
+        newStock.no = Date.now().toString(); // Unique ID based on timestamp
       }
-
-      // Add or update the product
-      await setDoc(doc(productsRef, newStock.no), newStock, { merge: true });
-
-      alert(
-        newStock.no
-          ? "Product added successfully!"
-          : "Product updated successfully!"
+  
+      const productDocRef = doc(productsRef, newStock.no);
+  
+      await setDoc(productDocRef, newStock, { merge: true });
+  
+      setProducts((prev) => {
+        const updatedProducts = prev.filter((prod) => prod.no !== newStock.no);
+        return [...updatedProducts, newStock];
+      });
+  
+      Swal.fire(
+        "Success",
+        newStock.no ? "Product updated successfully!" : "Product added successfully!",
+        "success"
       );
-
-      const updatedProducts = products.filter(
-        (prod) => prod.no !== newStock.no
-      );
-      setProducts([...updatedProducts, newStock]);
-
+  
       setShowModal(false);
       setNewStock({
         no: "",
@@ -121,10 +140,10 @@ const Stocks = () => {
       });
     } catch (error) {
       console.error("Error adding/updating product:", error);
-      alert("Failed to add or update the product.");
+      Swal.fire("Error", "Failed to add/update product.", "error");
     }
   };
-
+  
   const handleRemoveProduct = async (no) => {
     if (!user) {
       Swal.fire({
@@ -331,7 +350,7 @@ const Stocks = () => {
                   <td className="py-3 px-4">{product.no}</td>
                   <td className="py-3 px-4">{product.pname}</td>
                   <td className="py-3 px-4">{product.estock}</td>
-                  <td className="py-3 px-4">{currentStock}</td>
+                  <td className="py-3 px-4">{product.cstock}</td>
                   <td className="py-3 px-4">₹{product.price}</td>
                   <td className="py-3 px-4">
                     <button
