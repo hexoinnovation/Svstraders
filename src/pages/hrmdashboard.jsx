@@ -1,327 +1,192 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { FaShoppingCart } from "react-icons/fa";
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
-import { collection, onSnapshot, getDoc, doc, getDocs, query, where } from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { db, auth } from "../config/firebase"; // Import Firebase instance and auth
-import { getAuth } from 'firebase/auth'; 
+import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
+Chart.register(ArcElement, Tooltip, Legend);
 
-// Info Box component for displaying stats
-const InfoBox = ({ title, value, description, color }) => {
-  return (
-    <div
-      className={`flex items-center p-6 bg-gradient-to-r ${color} rounded-xl shadow-lg hover:shadow-2xl transition`}
-    >
-      <span className="text-white text-4xl font-semibold mr-6">{value}</span>
-      <div>
-        <h3 className="text-2xl font-semibold text-white">{title}</h3>
-        <p className="text-gray-200">{description}</p>
-      </div>
-    </div>
-  );
-};
+const db = getFirestore();
+const auth = getAuth();
 
-const HRMControl = () => {
-  const [currentUser] = useAuthState(auth); // Get the current user using Firebase hook
-  const [totalEmployees, setTotalEmployees] = useState(0);
-  const [presentEmployees, setPresentEmployees] = useState(0);
-  const [absentEmployees, setAbsentEmployees] = useState(0);
-  const [employees, setEmployees] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Search term state
-  const [roleFilter, setRoleFilter] = useState(""); // Role filter state
+const EndProduct = () => {
+  const [endProducts, setEndProducts] = useState([
+    { mesh: "40 Mesh", quantity: 0 },
+    { mesh: "60 Mesh", quantity: 0 },
+    { mesh: "80 Mesh", quantity: 0 },
+    { mesh: "100 Mesh", quantity: 0 },
+  ]);
+  const [storedProducts, setStoredProducts] = useState([]);
 
-  // Fetch employee data from Firestore on mount
   useEffect(() => {
-    if (currentUser?.email) {
-      // Path to Empdetails in the Firestore database
-      const userDocRef = collection(db, "admins", currentUser.email, "Empdetails");
+    fetchStoredProducts();
+  }, []);
 
-      // Fetch Total Employees Count
-      const fetchTotalEmployees = async () => {
-        try {
-          const snapshot = await getDoc(doc(db, "admins", currentUser.email));
-          const adminData = snapshot.data();
-          if (adminData && adminData.totalEmployees) {
-            setTotalEmployees(adminData.totalEmployees);
-          }
-        } catch (error) {
-          console.error("Error fetching total employees:", error);
-        }
-      };
-
-      // Fetch Employee Details
-      const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
-        const employeeData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setEmployees(employeeData);
-
-        // Calculate Present and Absent Employees
-        const present = employeeData.filter(
-          (employee) => employee.attendance === "Present"
-        ).length;
-        const absent = employeeData.filter(
-          (employee) => employee.attendance === "Absent"
-        ).length;
-
-        setPresentEmployees(present);
-        setAbsentEmployees(absent);
-      });
-
-      // Fetch total employees count once
-      fetchTotalEmployees();
-
-      // Cleanup the snapshot listener
-      return () => unsubscribe();
+  const fetchStoredProducts = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      toast.error("User not authenticated");
+      return;
     }
-  }, [currentUser?.email]);
 
+    const userEmail = currentUser.email;
+    const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
 
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setStoredProducts(docSnap.data().products);
+      } else {
+        setStoredProducts([]);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Error fetching stored data");
+    }
+  };
 
+  const handleInputChange = (index, field, value) => {
+    const updatedProducts = [...endProducts];
+    updatedProducts[index][field] = parseInt(value) || 0; // Ensure numerical input
+    setEndProducts(updatedProducts);
+  };
 
-  // Pie chart data for attendance distribution
-  const attendanceData = {
-    labels: ["Total Employees"],
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      toast.error("User not authenticated");
+      return;
+    }
+
+    const userEmail = currentUser.email;
+    const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
+
+    try {
+      await setDoc(docRef, { products: endProducts });
+      toast.success("End Product Quantities updated successfully!");
+      console.log("Data saved to Firestore:", endProducts);
+      fetchStoredProducts(); // Fetch updated data
+    } catch (error) {
+      toast.error("Error saving data");
+      console.error("Error saving to Firestore:", error);
+    }
+  };
+
+  // Pie chart data for End Product Quantities
+  const pieChartData = {
+    labels: endProducts.map((product) => product.mesh),
     datasets: [
       {
-        label: "Total Employees",
-        data: [totalEmployees], // ✅ Now `paidCount` is initialized
+        label: "End Product Quantities (kg)",
+        data: endProducts.map((product) => product.quantity),
         backgroundColor: [
-          "rgba(38, 228, 79, 0.7)",
-          "rgba(54, 162, 235, 0.7)",  
-          
-          "rgba(219, 30, 5, 0.7)",  
+          "rgba(38, 228, 79, 0.7)",  // Green
+          "rgba(54, 162, 235, 0.7)", // Blue
+          "rgba(255, 206, 86, 0.7)", // Yellow
+          "rgba(219, 30, 5, 0.7)",   // Red
         ],
         borderColor: [
-          "rgba(38, 228, 79, 0.7)",
-          "rgba(54, 162, 235, 1)",  
-          "rgba(219, 30, 5, 1)",  
+          "rgba(38, 228, 79, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(219, 30, 5, 1)",
         ],
         borderWidth: 1,
       },
     ],
   };
 
-  useEffect(() => {
-    const fetchEmployeeCount = async () => {
-      try {
-        if (!currentUser || !currentUser.email) {
-          console.error("User not authenticated or email missing.");
-          return;
-        }
-
-        // Reference to the user's "Empdetails" collection
-        const empDetailsCollectionRef = collection(db, "admins", currentUser.email, "Empdetails");
-
-        // Fetch all employee documents
-        const empDetailsSnapshot = await getDocs(empDetailsCollectionRef);
-
-        // Count the number of documents in the collection
-        const employeeCount = empDetailsSnapshot.size;
-
-        console.log("Total Employees:", employeeCount);
-
-        // Update the state
-        setTotalEmployees(employeeCount);
-      } catch (error) {
-        console.error("Error fetching employee count:", error.message);
-      }
-    };
-
-    fetchEmployeeCount();
-  }, [currentUser]);
-
-  // Filter employees based on multiple criteria including search term and role filter
-  const filteredEmployees = employees.filter((employee) => {
-    return (
-      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) && // Search by name
-      (roleFilter ? employee.role === roleFilter : true) && // Filter by Role
-      (employee.attendance === "Present" || employee.attendance === "Absent") // Ensure attendance filter
-    );
-  });
-
-// Fetch employee data
-const fetchEmployees = async () => {
-  const querySnapshot = await getDocs(userDocRef);
-  const employeeList = querySnapshot.docs.map((doc) => doc.data());
-  setFilteredEmployees(employeeList); // Assuming setFilteredEmployees is your state setter for employee data
-};
-
-
-
-const [paidCount, setPaidCount] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const user = getAuth().currentUser;
-  const userEmail = user ? user.email : null;  // Safely get the user email
-  // Fetch salary data for the logged-in user and calculate the counts
-  useEffect(() => {
-    if (!userEmail) return;  // If no user is logged in, don't fetch the data
-    const fetchSalaryData = async () => {
-      try {
-        // Reference to the "Salaryemp" sub-collection for the current user
-        const salaryCollectionRef = collection(db, "admins", userEmail, "Salaryemp");
-
-        // Query to get documents where status is true (Paid)
-        const paidQuery = query(salaryCollectionRef, where("status", "==", true));
-        const paidSnapshot = await getDocs(paidQuery);
-        setPaidCount(paidSnapshot.size); // Set the paid count based on the number of documents
-
-        // Query to get documents where status is false (Pending)
-        const pendingQuery = query(salaryCollectionRef, where("status", "==", false));
-        const pendingSnapshot = await getDocs(pendingQuery);
-        setPendingCount(pendingSnapshot.size); // Set the pending count based on the number of documents
-      } catch (error) {
-        console.error("Error fetching salary data:", error);
-      }
-    };
-
-    fetchSalaryData();
-  }, [userEmail]);  // Re-run when userEmail changes
-
-
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (!currentUser?.email) return;
-
-    const fetchEmployees = async () => {
-      try {
-        const userDocRef = collection(db, "admins", currentUser.email, "Empdetails");
-        const querySnapshot = await getDocs(userDocRef);
-
-        const employeeList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setEmployees(employeeList);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmployees();
-  }, [currentUser?.email]);
-  // if (loading) return <p className="text-center text-gray-400">Loading...</p>;
- 
-
-
   return (
-    <main className="p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 bg-gradient-to-br from-blue-100 to-indigo-100 min-h-screen w-full">
-      {/* Header Title */}
-      <div className="head-title flex justify-between items-center mb-12 bg-gradient-to-r from-blue-800 to-blue-600 p-8 rounded-2xl shadow-2xl">
-        <div className="left">
-          <h1 className="text-5xl font-bold text-white">HRM Dashboard</h1>
-          <ul className="breadcrumb flex space-x-3 text-sm text-white-400">
-            <li>
-              <a href="#" className="text-white hover:text-blue-400">Dashboard</a>
-            </li>
-            <li>
-              <i className="bx bx-chevron-right text-gray-400"></i>
-            </li>
-            <li>
-              <a href="#" className="text-white hover:text-blue-400">HRM</a>
-            </li>
-          </ul>
+    <div className="p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 bg-gradient-to-br from-blue-100 to-indigo-100 min-h-screen w-full">
+      <h1 className="text-5xl font-extrabold text-blue-900 mb-6 flex items-center">
+        End Product Management
+        <FaShoppingCart className="animate-drift ml-4" />
+      </h1>
+
+      <form onSubmit={handleSubmit}>
+        {/* End Product Form */}
+        <div className="bg-blue-900 p-6 rounded-md shadow-lg">
+          <h2 className="text-3xl font-semibold text-white mb-6">Product Details</h2>
+          <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {endProducts.map((product, index) => (
+              <div key={index} className="bg-white p-4 rounded-md shadow-lg">
+                <label
+                  htmlFor={`mesh-${product.mesh}`}
+                  className="text-lg font-semibold text-gray-700"
+                >
+                  {product.mesh}:
+                </label>
+                <input
+                  type="number"
+                  id={`mesh-${product.mesh}`}
+                  value={product.quantity}
+                  onChange={(e) => handleInputChange(index, "quantity", e.target.value)}
+                  className="p-2 w-full mt-2 border border-gray-300 rounded-md"
+                  placeholder="Enter Quantity (kg)"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="mt-6 text-center">
+          <button
+            type="submit"
+            className="bg-blue-900 text-white py-3 px-8 rounded-md hover:bg-blue-700 transition-all duration-300"
+          >
+            Update End Product Quantities
+          </button>
+        </div>
+      </form>
+
+      {/* Pie Chart for End Products */}
+      <div className="mt-8 bg-white p-6 rounded-md shadow-lg">
+        <h2 className="text-3xl font-semibold text-blue-900 mb-4">End Product Distribution</h2>
+        <div className="w-full max-w-md mx-auto">
+          <Pie data={pieChartData} options={{ responsive: true }} />
         </div>
       </div>
 
-
-
-      {/* Info Boxes for HRM Stats */}
-      <ul className="box-info grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
-        {/* Total Employees Info Box */}
-        <li>
-          <InfoBox
-            title="Total Employees"
-            value={totalEmployees}
-            description="Total Number of Employees"
-            color="from-blue-600 via-blue-700 to-blue-800"
-          />
-        </li>
-
-        {/* Present Employees Info Box */}
-        <li>
-          <InfoBox
-            title="Paid Salary"
-            value={paidCount}
-            description="Employees Paid Salary"
-            color="from-green-600 via-green-700 to-green-800"
-          />
-        </li>
-
-        {/* Absent Employees Info Box */}
-        <li>
-          <InfoBox
-            title="Pending Salary"
-            value={pendingCount}
-            description="Employees Pending Salary"
-            color="from-red-600 via-red-700 to-red-800"
-          />
-        </li>
-      </ul>
-
-      {/* Layout with Two Columns: Pie Chart and Employee Table */}
-      <div className="grid grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
-        {/* Left Column: Employee Table */}
-        <div className="employee-table bg-gradient-to-r from-blue-600 to-blue-700 p-8 rounded-2xl shadow-lg">
-          <h3 className="text-xl font-semibold text-gray-100 mb-6">Employee List</h3>
-          <table className="min-w-full table-auto text-gray-100">
-      <thead className="bg-blue-900">
-        <tr>
-          <th className="px-6 py-4 text-left text-white">No</th>
-          {/* <th className="px-6 py-4 text-left text-white">DOB</th> */}
-          <th className="px-6 py-4 text-left text-white">Profiles</th>
-          <th className="px-6 py-4 text-left text-white">Name</th>
-          <th className="px-6 py-4 text-left text-white">Role</th>
-          <th className="px-6 py-4 text-left text-white">Salary</th>
-        </tr>
-      </thead>
-      <tbody>
-  {employees.length === 0 ? (
-    <tr>
-      <td colSpan="6" className="text-center py-4 text-red-500 font-semibold">
-        No Employee Found
-      </td>
-    </tr>
-  ) : (
-    employees.slice(-5).map((employee, index) => (
-      <tr key={employee.id}>
-        <td className="px-6 py-4 text-left">{index + 1}</td>
-        <td className="px-6 py-4 text-left">
-          <div className="flex items-center gap-5">
-            <img
-              src={employee.photo || "/default-profile.png"} // Fallback image
-              alt="Employee"
-              className="rounded-full w-15 h-14"
-            />
-          </div>
-        </td>
-        <td className="px-6 py-4 text-left">{employee.name}</td>
-        <td className="px-6 py-4 text-left">{employee.role}</td>
-        <td className="px-6 py-4 ">₹{employee.salary}</td>
-      </tr>
-    ))
-  )}
-</tbody>
-          </table>
-        </div>
-
-        {/* Right Column: Pie Chart */}
-        <div className="chart-container bg-gradient-to-r from-white-900 via-white-700 to-white-800 p-8 rounded-2xl shadow-lg">
-          <h3 className="text-xl font-semibold text-gray-700 mb-6">Employees Distribution</h3>
-          <div className="w-full max-w-xs mx-auto">
-          <Pie data={attendanceData} options={{ responsive: true }} />
-          </div>
-        </div>
+      {/* Stored Data Table */}
+      <div className="mt-8 bg-white p-6 rounded-md shadow-lg">
+        <h2 className="text-3xl font-semibold text-blue-900 mb-4">Stored End Product Quantities</h2>
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-blue-900 text-white">
+              <th className="border border-gray-300 p-2">Mesh</th>
+              <th className="border border-gray-300 p-2">Quantity (kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {storedProducts.length > 0 ? (
+              storedProducts.map((product, index) => (
+                <tr key={index} className="bg-gray-100 text-gray-700">
+                  <td className="border border-gray-300 p-2">{product.mesh}</td>
+                  <td className="border border-gray-300 p-2">{product.quantity}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2" className="border border-gray-300 p-2 text-center">
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
-    </main>
+    </div>
   );
 };
 
-export default HRMControl;
+export default EndProduct;

@@ -135,57 +135,57 @@ const Navbar = ({ handleMenuClick }) => {
   //   }
   // };
   
-  useEffect(() => {
-    const fetchAllOrders = async () => {
-      const usersRef = collection(db, "users");
-      const userEmails = (await getDocs(usersRef)).docs.map((doc) => doc.id);
-      const unsubscribeFunctions = [];
+  // useEffect(() => {
+  //   const fetchAllOrders = async () => {
+  //     const usersRef = collection(db, "users");
+  //     const userEmails = (await getDocs(usersRef)).docs.map((doc) => doc.id);
+  //     const unsubscribeFunctions = [];
 
-      userEmails.forEach((email) => {
-        const buynowRef = collection(db, `users/${email}/buynow order`);
-        const cartRef = collection(db, `users/${email}/cart order`);
+  //     userEmails.forEach((email) => {
+  //       const buynowRef = collection(db, `users/${email}/buynow order`);
+  //       const cartRef = collection(db, `users/${email}/cart order`);
 
-        // Listener for `buynow` orders
-        const unsubscribeBuynow = onSnapshot(query(buynowRef), (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-              const newNotification = {
-                ...change.doc.data(),
-                id: change.doc.id,
-                type: "Buy Now",
-                userEmail: email,
-              };
-              updateNotifications(newNotification);
-              playNotificationSound();
-            }
-          });
-        });
-        unsubscribeFunctions.push(unsubscribeBuynow);
+  //       // Listener for `buynow` orders
+  //       const unsubscribeBuynow = onSnapshot(query(buynowRef), (snapshot) => {
+  //         snapshot.docChanges().forEach((change) => {
+  //           if (change.type === "added") {
+  //             const newNotification = {
+  //               ...change.doc.data(),
+  //               id: change.doc.id,
+  //               type: "Buy Now",
+  //               userEmail: email,
+  //             };
+  //             updateNotifications(newNotification);
+  //             playNotificationSound();
+  //           }
+  //         });
+  //       });
+  //       unsubscribeFunctions.push(unsubscribeBuynow);
 
-        // Listener for `cart` orders
-        const unsubscribeCart = onSnapshot(query(cartRef), (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-              const newNotification = {
-                ...change.doc.data(),
-                id: change.doc.id,
-                type: "Cart",
-                userEmail: email,
-              };
-              updateNotifications(newNotification);
-              playNotificationSound();
-            }
-          });
-        });
-        unsubscribeFunctions.push(unsubscribeCart);
-      });
-      return () => {
-        unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
-      };
-    };
+  //       // Listener for `cart` orders
+  //       const unsubscribeCart = onSnapshot(query(cartRef), (snapshot) => {
+  //         snapshot.docChanges().forEach((change) => {
+  //           if (change.type === "added") {
+  //             const newNotification = {
+  //               ...change.doc.data(),
+  //               id: change.doc.id,
+  //               type: "Cart",
+  //               userEmail: email,
+  //             };
+  //             updateNotifications(newNotification);
+  //             playNotificationSound();
+  //           }
+  //         });
+  //       });
+  //       unsubscribeFunctions.push(unsubscribeCart);
+  //     });
+  //     return () => {
+  //       unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
+  //     };
+  //   };
 
-    fetchAllOrders();
-  }, []);
+  //   fetchAllOrders();
+  // }, []);
   
   const dropdownRef = useRef(null);
   useEffect(() => {

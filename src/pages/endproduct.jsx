@@ -1,5 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaShoppingCart } from "react-icons/fa";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const db = getFirestore();
+const auth = getAuth();
 
 const EndProduct = () => {
   const [endProducts, setEndProducts] = useState([
@@ -8,6 +20,34 @@ const EndProduct = () => {
     { mesh: "80 Mesh", quantity: 0 },
     { mesh: "100 Mesh", quantity: 0 },
   ]);
+  const [storedProducts, setStoredProducts] = useState([]);
+
+  useEffect(() => {
+    fetchStoredProducts();
+  }, []);
+
+  const fetchStoredProducts = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      toast.error("User not authenticated");
+      return;
+    }
+
+    const userEmail = currentUser.email;
+    const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
+
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setStoredProducts(docSnap.data().products);
+      } else {
+        setStoredProducts([]);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Error fetching stored data");
+    }
+  };
 
   const handleInputChange = (index, field, value) => {
     const updatedProducts = [...endProducts];
@@ -15,10 +55,26 @@ const EndProduct = () => {
     setEndProducts(updatedProducts);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can send the data to your database or handle it as needed
-    console.log("EndProduct data submitted:", endProducts);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      toast.error("User not authenticated");
+      return;
+    }
+
+    const userEmail = currentUser.email;
+    const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
+
+    try {
+      await setDoc(docRef, { products: endProducts });
+      toast.success("End Product Quantities updated successfully!");
+      console.log("Data saved to Firestore:", endProducts);
+      fetchStoredProducts(); // Fetch updated data
+    } catch (error) {
+      toast.error("Error saving data");
+      console.error("Error saving to Firestore:", error);
+    }
   };
 
   return (
@@ -68,6 +124,35 @@ const EndProduct = () => {
           </button>
         </div>
       </form>
+
+      {/* Stored Data Table */}
+      <div className="mt-8 bg-white p-6 rounded-md shadow-lg">
+        <h2 className="text-3xl font-semibold text-blue-900 mb-4">Stored End Product Quantities</h2>
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-blue-900 text-white">
+              <th className="border border-gray-300 p-2">Mesh</th>
+              <th className="border border-gray-300 p-2">Quantity (kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {storedProducts.length > 0 ? (
+              storedProducts.map((product, index) => (
+                <tr key={index} className="bg-gray-100 text-gray-700">
+                  <td className="border border-gray-300 p-2">{product.mesh}</td>
+                  <td className="border border-gray-300 p-2">{product.quantity}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2" className="border border-gray-300 p-2 text-center">
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
