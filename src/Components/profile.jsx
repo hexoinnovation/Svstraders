@@ -44,7 +44,7 @@ const MyProfile = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const docRef = doc(db, "admins", user.email, "user_profiles", user.uid);
+      const docRef = doc(db, "admins", "saitraders@gmail.com", "user_profiles", user.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setProfile(docSnap.data());
@@ -158,7 +158,8 @@ const MyProfile = () => {
   const handleSave = async () => {
     try {
       // Confirm the doc path
-      const docRef = doc(db, "admins", user.email, "user_profiles", user.uid);
+      const docRef = doc(db, "admins", 
+        "saitraders@gmail.com", "user_profiles", user.uid);
       console.log('Updating document at path:', docRef); // Log the path
   
       // Ensure profile object contains the required fields
@@ -177,7 +178,7 @@ const MyProfile = () => {
     Swal.fire({
       title: "Reset Password",
       input: "password",
-      inputLabel: `Enter a new password for ${user.email}:`,
+      inputLabel: `Enter a new password for ${"saitraders@gmail.com"}:`,
       inputPlaceholder: "Enter new password",
       showCancelButton: true,
       confirmButtonColor: "#d33",

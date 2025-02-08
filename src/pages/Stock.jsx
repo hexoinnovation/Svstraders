@@ -46,7 +46,7 @@ const Stocks = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins","saitraders@gmail.com" );
         const productsRef = collection(userDocRef, "Purchase");
         const productSnapshot = await getDocs(productsRef);
 
@@ -85,7 +85,7 @@ const Stocks = () => {
     if (!user) return;
   
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
   
       // Fetch existing product details (to get the original estock value)
@@ -157,7 +157,7 @@ const Stocks = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productRef = doc(userDocRef, "Stocks", no);
 
       // Confirm deletion with SweetAlert

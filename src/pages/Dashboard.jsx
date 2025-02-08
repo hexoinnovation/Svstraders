@@ -37,7 +37,7 @@ const InventoryControl = () => {
         if (!user) return; // Ensure the user is authenticated
         
         // Reference to the admin's "Purchase" collection
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const productsRef = collection(userDocRef, "Purchase");
   
         // Fetch documents from the collection
@@ -69,7 +69,7 @@ const InventoryControl = () => {
         const user = getAuth().currentUser;
         if (!user) return;
 
-        const invoicesRef = collection(db, "admins", user.email, "Invoices");
+        const invoicesRef = collection(db, "admins", "saitraders@gmail.com", "Invoices");
         const querySnapshot = await getDocs(invoicesRef);
         setInvoiceCount(querySnapshot.size);
       } catch (error) {
@@ -84,7 +84,7 @@ const InventoryControl = () => {
     const fetchTotalStock = async () => {
       try {
         if (!user) return;
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins","saitraders@gmail.com");
         const productsRef = collection(userDocRef, "Purchase");
         const snapshot = await getDocs(productsRef);
         const stockTotal = snapshot.docs.reduce((acc, doc) => {
@@ -129,7 +129,7 @@ const InventoryControl = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const invoiceRef = collection(userDocRef, "Invoices");
         const invoiceSnapshot = await getDocs(invoiceRef);
 

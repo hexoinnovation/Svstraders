@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth"; // Import for logout functionality
-
+import { useState,useEffect } from "react";
+import { Link ,useNavigate} from "react-router-dom";
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth"; // Import Firebase auth
+import { toast } from "react-toastify";
 const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
   const [activeLink, setActiveLink] = useState("Dashboard");
 
@@ -21,7 +21,25 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
         toast.error("Error logging out. Please try again.");
       });
   };
+  
+  const [userEmail, setUserEmail] = useState(null); // Store logged-in user email
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const auth = getAuth();
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email); // Set email when user is logged in
+      } else {
+        setUserEmail(null); // Reset on logout
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
+
+ 
   return (
     <section id="sidebar" className={sidebarVisible ? "" : "hide print:hidden"}>
       <div className="sidebar-header p-8 bg-gradient-to-r from-blue-800 to-indigo-800">
@@ -36,8 +54,35 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
           {/* Larger text for logo */}
         </a>
       </div>
-
       <ul className="side-menu print:hidden space-y-4">
+        {/* Conditional Rendering for madhu@gmail.com */}
+        {userEmail === "madhu@gmail.com" ? (
+          <>
+              <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+          <Link to="/Stock" onClick={() => handleLinkClick("Stock")}>
+            <i className="bx bxs-package text-xl"></i>
+            <span className="text-lg ml-2">Stock</span>
+          </Link>
+        </li>
+    
+          {/* EndProduct Menu */}
+          <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+          <Link to="/endproduct" onClick={() => handleLinkClick("EndProduct")}>
+            <i className="bx bxs-cube text-xl"></i>
+            <span className="text-lg ml-2">End Product</span>
+          </Link>
+        </li>
+          
+            <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+              <Link to="/attendence" onClick={() => setActiveLink("attendence")}>
+                <i className="bx bxs-check-circle text-xl"></i>
+                <span className="text-lg ml-2">Attendance</span>
+              </Link>
+            </li>
+          </>
+        ) : (
+          <>
+     
         {/* Inventory Menu */}
         <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link to="/purchase" onClick={() => handleLinkClick("purchase")}>
@@ -144,6 +189,8 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
             </span>
           </Link>
         </li>
+        </>
+        )}
       </ul>
     </section>
   );

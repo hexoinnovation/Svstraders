@@ -38,7 +38,7 @@ const EndProduct = () => {
     }
 
     const userEmail = currentUser.email;
-    const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
+    const docRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
 
     try {
       const docSnap = await getDoc(docRef);
@@ -68,7 +68,7 @@ const EndProduct = () => {
     }
 
     const userEmail = currentUser.email;
-    const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
+    const docRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
 
     try {
       await setDoc(docRef, { products: endProducts });

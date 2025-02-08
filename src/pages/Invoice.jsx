@@ -67,7 +67,7 @@ const Invoice = () => {
         const user = auth.currentUser;
 
         if (user) {
-          const userDocRef = doc(db, "admins", user.email);
+          const userDocRef = doc(db, "admins", "saitraders@gmail.com");
 
           const customerQuery = query(collection(userDocRef, "Customers"));
           const customerSnapshot = await getDocs(customerQuery);
@@ -341,7 +341,7 @@ const Invoice = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const businessRef = collection(userDocRef, "Businesses");
       await setDoc(doc(businessRef, registrationNumber), {
         ...newBusiness, // Store the entire business object
@@ -404,7 +404,7 @@ const Invoice = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const businessRef = collection(userDocRef, "Businesses");
       const businessDocRef = doc(businessRef, registrationNumber);
 
@@ -483,7 +483,7 @@ const Invoice = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins","saitraders@gmail.com");
       const customerRef = collection(userDocRef, "Customers");
       await setDoc(doc(customerRef, email), {
         ...newCustomer, // Store the entire customer object
@@ -525,7 +525,7 @@ const Invoice = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const customersRef = collection(userDocRef, "Customers");
         const customerSnapshot = await getDocs(customersRef);
         const customerList = customerSnapshot.docs.map((doc) => doc.data());
@@ -544,7 +544,7 @@ const Invoice = () => {
   // Fetch products from the database
   const fetchAndFilterProducts = async (searchText) => {
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
       const productSnapshot = await getDocs(productsRef);
 
@@ -859,7 +859,7 @@ const Invoice = () => {
       const invoiceRef = doc(
         db,
         "admins",
-        user.email,
+       "saitraders@gmail.com",
         "Invoices",
         dataToSave.invoiceNumber.toString()
       );
