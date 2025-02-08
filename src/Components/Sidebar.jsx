@@ -24,15 +24,15 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
 
   return (
     <section id="sidebar" className={sidebarVisible ? "" : "hide print:hidden"}>
-      <div className="sidebar-header p-6 bg-gradient-to-r from-blue-800 to-indigo-800">
+      <div className="sidebar-header p-8 bg-gradient-to-r from-blue-800 to-indigo-800">
         {/* Logo Section */}
         <a href="#" className="brand flex items-center text-white">
           <img
             src="../src/assets/logo.png" // Replace with the correct path to your logo
             alt="SVS Traders Logo"
-            className="w-16 h-16 object-contain" // Increased size of the logo
+            className="w-13 h-13 object-contain" // Increased size of the logo
           />
-          <span className="text-4xl font-bold ml-4 print:hidden">Traders</span>{" "}
+          <span className="text-3xl font-bold ml-4 print:hidden"></span>{" "}
           {/* Larger text for logo */}
         </a>
       </div>
@@ -50,6 +50,17 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
           <Link to="/Stock" onClick={() => handleLinkClick("Stock")}>
             <i className="bx bxs-package text-xl"></i>
             <span className="text-lg ml-2">Stock</span>
+          </Link>
+        </li>
+
+        {/* Raw Materials Stock Menu */}
+        <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+          <Link
+            to="/rawmaterials"
+            onClick={() => handleLinkClick("rawmaterials")}
+          >
+            <i className="bx bxs-cube text-xl"></i>
+            <span className="text-lg ml-2">Raw Materials Stock</span>
           </Link>
         </li>
 
@@ -75,6 +86,16 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
             <span className="text-lg ml-2">Invoice Page</span>
           </Link>
         </li>
+        <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+          <Link
+            to="/viewAllInvoice"
+            onClick={() => handleLinkClick("viewAllInvoices")}
+          >
+            <i className="bx bxs-folder text-xl"></i>
+            <span className="text-lg ml-2">View All Invoices</span>
+          </Link>
+        </li>
+
         <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link
             to="/CustomerDetails"
@@ -123,29 +144,6 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
             </span>
           </Link>
         </li>
-
-        {/* Logout */}
-        {/* <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
-          <Link
-            to="#"
-            onClick={() => {
-              handleLogout();
-              handleLinkClick("logout");
-            }}
-            style={{ color: "red", fontWeight: "bold" }}
-          >
-            <i className="bx bx-log-out text-xl"></i>
-            <span className="ml-2 font-extrabold text-lg">Logout</span>
-          </Link>
-        </li> */}
-
-        {/* Help */}
-        {/* <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
-          <Link to="/help">
-            <i className="bx bxs-help-circle text-xl"></i>
-            <span className="text-lg ml-2">Help</span>
-          </Link>
-        </li> */}
       </ul>
     </section>
   );
