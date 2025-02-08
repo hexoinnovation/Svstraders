@@ -46,7 +46,7 @@ const Purchase = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const productsRef = collection(userDocRef, "Purchase");
         const productSnapshot = await getDocs(productsRef);
         const productList = productSnapshot.docs.map((doc) => doc.data());
@@ -74,7 +74,7 @@ const Purchase = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
 
       if (!newProduct.no) {
@@ -111,7 +111,7 @@ const Purchase = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
 
       await setDoc(doc(productsRef, newProduct.phone), newProduct);
@@ -134,7 +134,7 @@ const Purchase = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
 
       await deleteDoc(doc(productsRef, phone));

@@ -131,7 +131,7 @@ const ReportTabs = () => {
           const collectionRef = collection(
             db,
             "admins",
-            currentUser.email,
+            "saitraders@gmail.com",
             collectionName
           );
           const snapshot = await getDocs(collectionRef);

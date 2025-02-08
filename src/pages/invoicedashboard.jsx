@@ -33,7 +33,7 @@ const InvoiceControl = () => {
     if (!user) return; // Ensure user is logged in before proceeding
 
     const fetchInvoices = () => {
-      const invoicesRef = collection(db, "admins", user.email, "Invoices");
+      const invoicesRef = collection(db, "admins", "saitraders@gmail.com", "Invoices");
       const unsubscribe = onSnapshot(invoicesRef, (snapshot) => {
         const invoiceData = snapshot.docs.map((doc) => ({
           id: doc.id,

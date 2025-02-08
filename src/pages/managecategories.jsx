@@ -39,7 +39,7 @@ const ManageCategories = ({ currentUser }) => {
 
   // Check if userEmail exists before accessing Firestore collection
   const categoriesCollection = userEmail
-    ? collection(db, "admins", userEmail, "categories")
+    ? collection(db, "admins", "saitraders@gmail.com", "categories")
     : null;
 
   useEffect(() => {
@@ -83,7 +83,7 @@ const ManageCategories = ({ currentUser }) => {
     }
 
     try {
-      const categoryDoc = doc(db, "admins", userEmail, "categories", editCategoryId);
+      const categoryDoc = doc(db, "admins", "saitraders@gmail.com", "categories", editCategoryId);
       await updateDoc(categoryDoc, newCategory);
       setCategories((prevCategories) =>
         prevCategories.map((category) =>
@@ -103,7 +103,7 @@ const ManageCategories = ({ currentUser }) => {
     }
 
     try {
-      const categoryDoc = doc(db, "admins", userEmail, "categories", id);
+      const categoryDoc = doc(db, "admins", "saitraders@gmail.com", "categories", id);
       await deleteDoc(categoryDoc);
       setCategories((prevCategories) =>
         prevCategories.filter((category) => category.id !== id)

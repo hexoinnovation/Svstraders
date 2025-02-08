@@ -64,7 +64,7 @@ const SalaryApp = () => {
   
         // Fetch employee details
         const employeeQuery = query(
-          collection(db, "admins", currentUser.email, "Empdetails")
+          collection(db, "admins", "saitraders@gmail.com", "Empdetails")
         );
         const employeeSnapshot = await getDocs(employeeQuery);
         const fetchedEmployees = employeeSnapshot.docs.map((doc) => ({
@@ -78,7 +78,7 @@ const SalaryApp = () => {
         const salaryCollectionRef = collection(
           db,
           "admins",
-          currentUser.email,
+          "saitraders@gmail.com",
           "salary"
         );
         const salarySnapshot = await getDocs(salaryCollectionRef);
@@ -92,7 +92,7 @@ const SalaryApp = () => {
         const attendanceCollectionRef = collection(
           db,
           "admins",
-          currentUser.email,
+          "saitraders@gmail.com",
           "attendance"
         );
         const attendanceSnapshot = await getDocs(attendanceCollectionRef);
@@ -189,7 +189,7 @@ const SalaryApp = () => {
       const salaryCollectionRef = collection(
         db,
         "admins",
-        user.email,
+       "saitraders@gmail.com",
         "salary"
       );
   
@@ -294,7 +294,7 @@ const SalaryApp = () => {
         const salaryDocRef = doc(
           db,
           "admins",
-          user.email,
+          "saitraders@gmail.com",
           "salary",
           salaryId
         );
