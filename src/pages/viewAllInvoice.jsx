@@ -14,6 +14,7 @@ import { FaFileInvoice } from "react-icons/fa6";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
+
 const ViewAllInvoice = () => {
   const [user] = useAuthState(auth);
   const [invoiceData, setInvoiceData] = useState([]);
