@@ -15,10 +15,10 @@ const auth = getAuth();
 
 const EndProduct = () => {
   const [endProducts, setEndProducts] = useState([
-    { mesh: "40 Mesh", quantity: 0 },
-    { mesh: "60 Mesh", quantity: 0 },
-    { mesh: "80 Mesh", quantity: 0 },
-    { mesh: "100 Mesh", quantity: 0 },
+    { mesh: "40 Mesh", quantity: "" },
+    { mesh: "60 Mesh", quantity: "" },
+    { mesh: "80 Mesh", quantity: "" },
+    { mesh: "100 Mesh", quantity: "" },
   ]);
   const [storedProducts, setStoredProducts] = useState([]);
 
@@ -51,7 +51,7 @@ const EndProduct = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedProducts = [...endProducts];
-    updatedProducts[index][field] = value;
+    updatedProducts[index][field] = Number(value);  // Ensure numeric value
     setEndProducts(updatedProducts);
   };
 
@@ -62,20 +62,42 @@ const EndProduct = () => {
       toast.error("User not authenticated");
       return;
     }
-
+  
     const userEmail = currentUser.email;
     const docRef = doc(db, "admins", userEmail, "End Product Quantities", "latest");
-
+  
     try {
-      await setDoc(docRef, { products: endProducts });
+      const docSnap = await getDoc(docRef);
+      let updatedProducts = [...endProducts];
+  
+      if (docSnap.exists()) {
+        const existingProducts = docSnap.data().products;
+  
+        updatedProducts = updatedProducts.map((product) => {
+          const existingProduct = existingProducts.find((p) => p.mesh === product.mesh);
+          const newQuantity = Number(product.quantity);
+          const existingQuantity = existingProduct ? Number(existingProduct.quantity) : ""; // Ensure numeric
+          
+          return {
+            mesh: product.mesh,
+            quantity: existingQuantity + newQuantity, // Correct numeric addition
+          };
+        });
+      }
+  
+      // Save updated quantities to Firestore
+      await setDoc(docRef, { products: updatedProducts });
+  
       toast.success("End Product Quantities updated successfully!");
-      console.log("Data saved to Firestore:", endProducts);
-      fetchStoredProducts(); // Fetch updated data
+      console.log("Updated data saved to Firestore:", updatedProducts);
+  
+      fetchStoredProducts(); // Refresh stored data
     } catch (error) {
       toast.error("Error saving data");
       console.error("Error saving to Firestore:", error);
     }
   };
+  
 
   return (
     <div className="p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 bg-gradient-to-br from-blue-100 to-indigo-100 min-h-screen w-full">
