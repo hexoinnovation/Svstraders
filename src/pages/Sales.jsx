@@ -109,17 +109,51 @@ const Sales = () => {
       console.error("No invoice selected for printing.");
       return;
     }
-
+  
     const content = document.getElementById("popup-modal");
-
-    html2canvas(content, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const doc = new jsPDF();
-      doc.addImage(canvas.toDataURL("image/png"), "PNG", 10, 10, 180, 0);
-      doc.save(`invoice-${selectedInvoice.invoiceNumber}.pdf`);
-    });
+    
+    if (!content) {
+      console.error("Print content not found.");
+      return;
+    }
+  
+    // Clone the content to avoid affecting the modal
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Invoice</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+            }
+            .invoice-container {
+              width: 100%;
+              max-width: 800px;
+              margin: auto;
+              padding: 20px;
+              border: 1px solid #ddd;
+            }
+            @media print {
+              body {
+                -webkit-print-color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-container">${content.innerHTML}</div>
+          <script>
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() { window.close(); };
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleClosePopup = () => {
@@ -524,12 +558,12 @@ const Sales = () => {
 
             {/* Print Button */}
             <div className="mt-6 text-right">
-              <button
-                onClick={handlePrint}
-                className="bg-blue-900 text-white py-2 px-2 rounded-md"
-              >
-                Print Invoice
-              </button>
+            <button
+    onClick={handlePrint}
+    className="bg-blue-900 text-white py-2 px-2 rounded-md"
+  >
+    Print Invoice
+  </button>
             </div>
           </div>
         </div>
