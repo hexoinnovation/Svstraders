@@ -56,7 +56,7 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
       </div>
       <ul className="side-menu print:hidden space-y-4">
         {/* Conditional Rendering for madhu@gmail.com */}
-        {userEmail === "madhu@gmail.com" ? (
+        {userEmail === "saiemp@gmail.com" ? (
           <>
               <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link to="/Stock" onClick={() => handleLinkClick("Stock")}>

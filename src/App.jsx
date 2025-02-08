@@ -106,7 +106,7 @@ const App = () => {
     setSidebarVisible((prevState) => !prevState);
   };
   const handleUserLogin = () => {
-    if (email === "madhu@gmail.com" && password === "Hexo@123") {
+    if (email === "saiemp@gmail.com" && password === "Hexo@123") {
       setIsAuthenticated(true);
       setErrorMessage(""); // Clear errors
       alert("User login successful!");
