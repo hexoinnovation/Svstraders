@@ -1237,7 +1237,7 @@ const Invoice = () => {
                   onChange={handleCustomerChange}
                   className=" print:hidden w-full px-4 py-2 border-2 border-indigo-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-              <p>Select Customer</p>
+                <p>Select Customer</p>
                  
                   {customerList.map((customer) => (
                     <option key={customer.id} value={customer.id}>
