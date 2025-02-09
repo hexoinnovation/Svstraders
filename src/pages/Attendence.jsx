@@ -51,7 +51,7 @@ const AttendanceApp = (currentUser) => {
         setUser(currentUser);
   
         if (currentUser) {
-          // Fetch Employees
+          // Fetch Employeescom
           const employeeQuery = collection(db, "admins", "saitraders@gmail.com", "Empdetails");
           const employeeSnapshot = await getDocs(employeeQuery);
           let fetchedEmployees = [];
