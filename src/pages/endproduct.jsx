@@ -8,6 +8,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  runTransaction ,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { toast } from "react-toastify";
@@ -243,15 +244,21 @@ const EndProduct = () => {
 
 
   const handleUpdateQuantity = async () => {
+    const db = getFirestore();
     const docRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
 
     try {
         // Fetch the latest stored data
         const docSnap = await getDoc(docRef);
         let existingProducts = [];
+        let rawMaterialQuantity = 0;
+        let existingRawMaterialStock = 0;
 
         if (docSnap.exists()) {
-            existingProducts = docSnap.data().products || [];
+            const docData = docSnap.data();
+            existingProducts = docData.products || [];
+            rawMaterialQuantity = docData.rawMaterialQuantity || 0; // Preserve raw material quantity
+            existingRawMaterialStock = docData.existingRawMaterialStock || 0; // Preserve existing stock
         }
 
         // Prepare updated product data
@@ -267,8 +274,12 @@ const EndProduct = () => {
             };
         });
 
-        // Store updated data in Firestore
-        await setDoc(docRef, { products: productData });
+        // Store updated data **without removing rawMaterialQuantity & existingRawMaterialStock**
+        await setDoc(docRef, {
+            products: productData,
+            rawMaterialQuantity,  // Preserve this field
+            existingRawMaterialStock // Preserve this field
+        }, { merge: true }); // ✅ Use merge to avoid overwriting other fields
 
         alert("Latest quantities updated successfully!");
     } catch (error) {
@@ -277,22 +288,23 @@ const EndProduct = () => {
     }
 };
 
+
 const handleSubmit = async () => {
   const db = getFirestore(); // Ensure Firestore instance
+
   const endProductDocRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
-  const purchaseDocRef = doc(db, "admins", "saitraders@gmail.com", "Purchase", "8108000");
+  const purchaseDocRef = doc(db, "admins", "saitraders@gmail.com", "Purchase", "8108000"); 
 
   try {
       // Run a Firestore transaction to update both documents atomically
       await runTransaction(db, async (transaction) => {
-          // Fetch the latest existing stock data
-          const endProductDocSnap = await transaction.get(endProductDocRef);
+          // Fetch existing stock data from Purchase document
           const purchaseDocSnap = await transaction.get(purchaseDocRef);
 
           let existingStock = 0;
 
-          if (endProductDocSnap.exists()) {
-              existingStock = Number(endProductDocSnap.data().existingRawMaterialStock) || 0;
+          if (purchaseDocSnap.exists()) {
+              existingStock = Number(purchaseDocSnap.data().estock) || 0;
           }
 
           // Ensure values are numbers (avoid NaN issues)
@@ -303,14 +315,13 @@ const handleSubmit = async () => {
 
           // Prepare updated data
           const updatedData = {
-              ...endProductDocSnap.data(), // Keep existing data
               rawMaterialQuantity: rawMaterialValue, // New raw material quantity
               existingRawMaterialStock: updatedStock, // Updated stock after subtraction
           };
 
-          // Update both documents
+          // Update both `End Product Quantities/latest` and `Purchase/8108000`
           transaction.set(endProductDocRef, updatedData, { merge: true });
-          transaction.set(purchaseDocRef, { estock: updatedStock }, { merge: true });
+          transaction.set(purchaseDocRef, { ...updatedData, estock: updatedStock }, { merge: true });
       });
 
       alert("Raw Material Data Updated Successfully!");
@@ -584,29 +595,27 @@ useEffect(() => {
           <table className="w-full table-auto border-collapse text-gray-600">
             <thead>
               <tr className="bg-blue-600 text-white">
-                <th className="p-4">Date</th>
-                <th className="p-4">40-Mesh</th>
-                <th className="p-4">60-Mesh</th>
-                <th className="p-4">80-Mesh</th>
-                <th className="p-4">100-Mesh</th>
-                <th className="p-4">Raw Material</th>
-                <th className="p-4">Actions</th>
+                <th className="p-4 text-start">40-Mesh</th>
+                <th className="p-4 text-start">60-Mesh</th>
+                <th className="p-4 text-start">80-Mesh</th>
+                <th className="p-4 text-start">100-Mesh</th>
+                <th className="p-4 text-start">Raw Material</th>
+                <th className="p-4 text-start">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredData.length > 0 ? (
                 filteredData.map((data, index) => (
                   <tr key={index} className="border-b border-gray-300">
-                    <td className="p-4">{data.date}</td>
                     {data.products.map((product, pIndex) => (
                       <td key={pIndex} className="p-4">
                         {product.mesh}: {product.quantity} kg
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 ">
                           Outgoing: {product.outgoingQuantity} kg
                         </p>
                       </td>
                     ))}
-                    <td className="p-4">{data.rawMaterial} kg</td>
+                    <td className="p-4">{data.existingRawMaterialStock} kg</td>
                     <td className="p-4">
                       <button
                         onClick={() => handleDelete(data.date)}
