@@ -107,7 +107,7 @@ const EndProduct = () => {
     setSearchQuery(e.target.value); // Set search query for filtering
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmi = async (e) => {
     e.preventDefault();
     setIsButtonActive(false); // Disable the button during the process
     setButtonMessage("Updating... Please wait...");
@@ -238,6 +238,112 @@ const EndProduct = () => {
 
     return dateInRange && searchMatch;
   });
+
+
+
+
+  const handleUpdateQuantity = async () => {
+    const docRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
+
+    try {
+        // Fetch the latest stored data
+        const docSnap = await getDoc(docRef);
+        let existingProducts = [];
+
+        if (docSnap.exists()) {
+            existingProducts = docSnap.data().products || [];
+        }
+
+        // Prepare updated product data
+        const productData = endProducts.map((product) => {
+            // Check if this product (mesh type) already exists
+            const existingProduct = existingProducts.find(p => p.mesh === product.mesh);
+            const previousQuantity = existingProduct ? existingProduct.quantity : 0;
+
+            return {
+                mesh: product.mesh,
+                quantity: Math.max(0, previousQuantity + product.quantity - product.outgoingQuantity), // Add new quantity, then subtract outgoing
+                outgoingQuantity: product.outgoingQuantity,
+            };
+        });
+
+        // Store updated data in Firestore
+        await setDoc(docRef, { products: productData });
+
+        alert("Latest quantities updated successfully!");
+    } catch (error) {
+        console.error("Error updating quantities:", error);
+        alert("Failed to update quantities. Check console for details.");
+    }
+};
+
+const handleSubmit = async () => {
+  const db = getFirestore(); // Ensure Firestore instance
+  const endProductDocRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
+  const purchaseDocRef = doc(db, "admins", "saitraders@gmail.com", "Purchase", "8108000");
+
+  try {
+      // Run a Firestore transaction to update both documents atomically
+      await runTransaction(db, async (transaction) => {
+          // Fetch the latest existing stock data
+          const endProductDocSnap = await transaction.get(endProductDocRef);
+          const purchaseDocSnap = await transaction.get(purchaseDocRef);
+
+          let existingStock = 0;
+
+          if (endProductDocSnap.exists()) {
+              existingStock = Number(endProductDocSnap.data().existingRawMaterialStock) || 0;
+          }
+
+          // Ensure values are numbers (avoid NaN issues)
+          const rawMaterialValue = Number(rawMaterial) || 0;
+
+          // Perform subtraction: existingStock - rawMaterialValue
+          const updatedStock = Math.max(0, existingStock - rawMaterialValue); // Prevent negative values
+
+          // Prepare updated data
+          const updatedData = {
+              ...endProductDocSnap.data(), // Keep existing data
+              rawMaterialQuantity: rawMaterialValue, // New raw material quantity
+              existingRawMaterialStock: updatedStock, // Updated stock after subtraction
+          };
+
+          // Update both documents
+          transaction.set(endProductDocRef, updatedData, { merge: true });
+          transaction.set(purchaseDocRef, { estock: updatedStock }, { merge: true });
+      });
+
+      alert("Raw Material Data Updated Successfully!");
+  } catch (error) {
+      console.error("Error updating raw material data:", error);
+      alert("Failed to update data. Check console for details.");
+  }
+};
+
+
+useEffect(() => {
+  const fetchEstock = async () => {
+      try {
+          // Reference to the document
+          const userDocRef = doc(db, "admins", "saitraders@gmail.com", "Purchase", "8108000");
+
+          // Fetch the document
+          const docSnap = await getDoc(userDocRef);
+
+          if (docSnap.exists()) {
+              const data = docSnap.data();
+              setExistingRawMaterialStock(data.estock || ""); // Set estock value or empty if undefined
+          } else {
+              console.log("No such document!");
+          }
+      } catch (error) {
+          console.error("Error fetching estock:", error);
+      }
+  };
+
+  fetchEstock();
+}, []);
+
 
   // Delete data by date
   const handleDelete = async (date) => {
@@ -424,46 +530,41 @@ const EndProduct = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold text-gray-700">
+            <h2 className="text-2xl font-semibold text-gray-700">
                 Existing Raw Material Stock
-              </h2>
-              <div className="p-4 border rounded-md shadow-md mt-4">
+            </h2>
+            <div className="p-4 border rounded-md shadow-md mt-4">
                 <input
-                  type="number"
-                  value={existingRawMaterialStock}
-                  onChange={handleExistingStockChange}
-                  className="mt-2 p-2 w-full border border-gray-300 rounded-md"
-                  placeholder="Enter Existing Raw Material Stock"
+                    type="number"
+                    value={existingRawMaterialStock}
+                    onChange={(e) => setExistingRawMaterialStock(e.target.value)}
+                    className="mt-2 p-2 w-full border border-gray-300 rounded-md"
+                    placeholder="Enter Existing Raw Material Stock"
                 />
-              </div>
             </div>
+        </div>
           </div>
 
           {/* Submit Buttons */}
           <div className="text-center flex gap-4 justify-center">
             {/* Update Quantities Button */}
             <button
-              type="submit"
-              disabled={!isButtonActive}
-              className={`${
-                isButtonActive ? "bg-blue-600" : "bg-gray-400"
-              } text-white py-3 px-6 rounded-lg hover:bg-blue-500 transition duration-300`}
-            >
-              {isButtonActive ? "Update Quantities" : "Updating..."}
-            </button>
+  type="button"
+  disabled={!isButtonActive}
+  onClick={handleUpdateQuantity}
+  className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-yellow-500 transition duration-300"
+>
+  Update Quantity
+</button>
 
             {/* Update Raw Material Button */}
             <button
               type="button"
               onClick={handleSubmit} // Add a new handler for raw material update
               disabled={!isButtonActive}
-              className={`${
-                isButtonActive ? "bg-yellow-600" : "bg-gray-400"
-              } text-white py-3 px-6 rounded-lg hover:bg-yellow-500 transition duration-300`}
+              className={"bg-blue-800 text-white py-3 px-6 rounded-lg hover:bg-yellow-500 transition duration-300"}
             >
-              {isButtonActive
-                ? "Update Raw Material"
-                : "Updating Raw Material..."}
+              Update Raw Material
             </button>
             <button
               onClick={handleExport}
