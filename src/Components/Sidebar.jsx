@@ -99,7 +99,7 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
         </li>
 
         {/* Raw Materials Stock Menu */}
-        <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
+        {/* <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link
             to="/rawmaterials"
             onClick={() => handleLinkClick("rawmaterials")}
@@ -107,7 +107,7 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
             <i className="bx bxs-cube text-xl"></i>
             <span className="text-lg ml-2">Raw Materials Stock</span>
           </Link>
-        </li>
+        </li> */}
 
         <li className="flex justify-between items-center p-4 hover:bg-indigo-200 rounded-lg transition-all duration-300">
           <Link to="/sales" onClick={() => handleLinkClick("sales")}>
