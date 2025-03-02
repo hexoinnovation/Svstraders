@@ -9,6 +9,7 @@ const Sidebar = ({ sidebarVisible, toggleSidebar }) => {
     setActiveLink(link);
   };
 
+  
   const handleLogout = () => {
     const auth = getAuth();
     signOut(auth)
