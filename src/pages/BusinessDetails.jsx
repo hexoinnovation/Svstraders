@@ -45,7 +45,9 @@ const BusinessDetails = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", 
+          "saitraders@gmail.com"
+        );
         const businessesRef = collection(userDocRef, "Businesses");
         const businessSnapshot = await getDocs(businessesRef);
         const businessList = businessSnapshot.docs.map((doc) => doc.data());
@@ -75,7 +77,9 @@ const BusinessDetails = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", 
+        "saitraders@gmail.com"
+      );
       const businessRef = collection(userDocRef, "Businesses");
       await setDoc(
         doc(businessRef, newBusiness.registrationNumber),
@@ -106,7 +110,7 @@ const BusinessDetails = () => {
       const businessDoc = doc(
         db,
         "admins",
-        user.email,
+       "saitraders@gmail.com",
         "Businesses",
         registrationNumber
       );
@@ -138,7 +142,7 @@ const BusinessDetails = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const businessRef = collection(userDocRef, "Businesses");
       const businessDocRef = doc(businessRef, newBusiness.registrationNumber);
 

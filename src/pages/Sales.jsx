@@ -29,7 +29,7 @@ const Sales = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const invoiceRef = collection(userDocRef, "Invoices");
         const invoiceSnapshot = await getDocs(invoiceRef);
 
@@ -85,7 +85,7 @@ const Sales = () => {
       const invoiceRef = doc(
         db,
         "admins",
-        auth.currentUser.email,
+       "saitraders@gmail.com",
         "Invoices",
         invoiceNumber.toString()
       );

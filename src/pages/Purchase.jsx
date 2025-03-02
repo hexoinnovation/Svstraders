@@ -4,6 +4,8 @@ import {
   doc,
   getDocs,
   setDoc,
+  getFirestore,
+  runTransaction ,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -46,7 +48,7 @@ const Purchase = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const productsRef = collection(userDocRef, "Purchase");
         const productSnapshot = await getDocs(productsRef);
         const productList = productSnapshot.docs.map((doc) => doc.data());
@@ -74,7 +76,7 @@ const Purchase = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
 
       if (!newProduct.no) {
@@ -110,31 +112,65 @@ const Purchase = () => {
     e.preventDefault();
     if (!user) return;
 
+    const db = getFirestore(); // ✅ Ensure Firestore is initialized
+    const endProductDocRef = doc(db, "admins", "saitraders@gmail.com", "End Product Quantities", "latest");
+    const purchaseDocRef = doc(db, "admins", "saitraders@gmail.com", "Purchase", "8108000");
+
     try {
-      const userDocRef = doc(db, "admins", user.email);
-      const productsRef = collection(userDocRef, "Purchase");
+        await runTransaction(db, async (transaction) => {
+            // Fetch existing stock data from Purchase document
+            const purchaseDocSnap = await transaction.get(purchaseDocRef);
+            const endProductDocSnap = await transaction.get(endProductDocRef);
 
-      await setDoc(doc(productsRef, newProduct.phone), newProduct);
+            let existingRawMaterialStock = 0;
+            if (purchaseDocSnap.exists()) {
+                existingRawMaterialStock = Number(purchaseDocSnap.data().existingRawMaterialStock) || 0;
+            }
 
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.phone === newProduct.phone ? newProduct : product
-        )
-      );
-      Swal.fire("Success", "Product updated successfully!", "success");
-      setShowModal(false);
-      setEditMode(false);
+            // Ensure newProduct contains numeric values
+            const rawMaterialUsed = Number(newProduct.rawMaterialUsed) || 0;
+            const updatedStock = Math.max(0, existingRawMaterialStock - rawMaterialUsed); // Prevent negative values
+
+            // Prepare updated data for Purchase
+            const updatedPurchaseData = {
+                ...newProduct,
+                existingRawMaterialStock: updatedStock, // Update stock
+            };
+
+            // Prepare updated data for End Product Quantities
+            const updatedEndProductData = {
+                rawMaterialQuantity: rawMaterialUsed, // Store the latest used raw material
+                existingRawMaterialStock: updatedStock, // Update stock
+            };
+
+            // Update both documents
+            transaction.set(purchaseDocRef, updatedPurchaseData, { merge: true });
+            transaction.set(endProductDocRef, updatedEndProductData, { merge: true });
+        });
+
+        // Update local state
+        setProducts((prev) =>
+            prev.map((product) =>
+                product.phone === newProduct.phone ? newProduct : product
+            )
+        );
+
+        Swal.fire("Success", "Product updated successfully!", "success");
+        setShowModal(false);
+        setEditMode(false);
     } catch (error) {
-      console.error("Error updating product: ", error);
-      Swal.fire("Error", "Failed to update product.", "error");
+        console.error("Error updating product: ", error);
+        Swal.fire("Error", "Failed to update product.", "error");
     }
-  };
+};
+
+
 
   const handleRemoveProduct = async (phone) => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
 
       await deleteDoc(doc(productsRef, phone));

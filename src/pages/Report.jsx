@@ -99,7 +99,7 @@ const ReportTabs = () => {
       "contactNumber",
       "gstNumber",
       "city",
-      "state",
+      
     ],
     customers: ["name", "city", "phone", "aadhaar", "email", "panno"],
     endproduct: ["mesh", "quantity"], // Fields for EndProduct
@@ -131,7 +131,7 @@ const ReportTabs = () => {
           const collectionRef = collection(
             db,
             "admins",
-            currentUser.email,
+            "saitraders@gmail.com",
             collectionName
           );
           const snapshot = await getDocs(collectionRef);

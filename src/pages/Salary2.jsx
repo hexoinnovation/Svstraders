@@ -84,7 +84,7 @@ const SalaryApp = ({ updateSalaryStatus }) => {  // Destructure props properly
   
         // Fetch employee details
         const employeeQuery = query(
-          collection(db, "admins", currentUser.email, "Empdetails")
+          collection(db, "admins", "saitraders@gmail.com", "Empdetails")
         );
         const employeeSnapshot = await getDocs(employeeQuery);
         const fetchedEmployees = employeeSnapshot.docs.map((doc) => ({
@@ -98,7 +98,7 @@ const SalaryApp = ({ updateSalaryStatus }) => {  // Destructure props properly
         const attendanceCollectionRef = collection(
           db,
           "admins",
-          currentUser.email,
+          "saitraders@gmail.com",
           "attendance"
         );
         const attendanceSnapshot = await getDocs(attendanceCollectionRef);
@@ -151,7 +151,7 @@ const SalaryApp = ({ updateSalaryStatus }) => {  // Destructure props properly
       const promises = [];
       for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
         const formattedDate = date.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-        const docRef = doc(db, "admins", user.email, "attendance", formattedDate);
+        const docRef = doc(db, "admins", "saitraders@gmail.com", "attendance", formattedDate);
         const promise = getDoc(docRef).then((docSnap) => {
           if (docSnap.exists()) {
             const attendanceData = docSnap.data();
@@ -319,7 +319,7 @@ const generateSalaryReceipt = (employee) => {
         Deduction:deductions,
       };
       const docPath = `${viewEmployee.id}_${salaryDate}`;
-      const docRef = doc(db, "admins", user.email, "Salaryemp", docPath);
+      const docRef = doc(db, "admins", "saitraders@gmail.com", "Salaryemp", docPath);
       await setDoc(docRef, employeeData);
   
       alert("Employee salary details saved successfully!");
@@ -344,7 +344,7 @@ const generateSalaryReceipt = (employee) => {
       const salaryCollectionRef = collection(
         db,
         "admins",
-        user.email,
+        "saitraders@gmail.com",
         "Salaryemp"
       );
       const querySnapshot = await getDocs(salaryCollectionRef);

@@ -67,7 +67,7 @@ const Invoice = () => {
         const user = auth.currentUser;
 
         if (user) {
-          const userDocRef = doc(db, "admins", user.email);
+          const userDocRef = doc(db, "admins", "saitraders@gmail.com");
 
           const customerQuery = query(collection(userDocRef, "Customers"));
           const customerSnapshot = await getDocs(customerQuery);
@@ -270,51 +270,6 @@ const Invoice = () => {
     setIsPopupOpen(false); // Close the popup
   };
 
-  // Print Handler
-  const handlePrint = () => {
-    const printContent = document.getElementById("invoiceContainers"); // Get the invoice container
-    const printWindow = window.open("", "", "height=700, width=1000"); // Open a new window
-
-    // Add styles for print
-    printWindow.document.write("<html><head><title>Print Invoice</title>");
-    printWindow.document.write("<style>");
-    printWindow.document.write(`
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1, h3 { margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        td, th { padding: 8px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #f0f0f0; }
-        p { margin: 5px 0; }
-        .hidden-print { display: none; } /* Hide elements with this class during print */
-        @media print {
-          body {
-            margin-top: 0;
-          }
-          .sidebar {
-            display: none !important; /* Hide sidebar during print */
-          }
-          .content {
-            margin-top: 0 !important; /* Adjust content margins for print */
-          }
-          .print\\:hidden {
-            display: none; /* Hide elements with class 'print:hidden' */
-          }
-  .bill-to-right-align {
-    display: flex;
-    justify-content: flex-end;
-    text-align: right;
-    width: 100%;
-  }
-        }
-      `);
-    printWindow.document.write("</style></head><body>");
-    printWindow.document.write(printContent.outerHTML); // Clone and write the invoice content
-    printWindow.document.write("</body></html>");
-
-    printWindow.document.close(); // Close the document for rendering
-    printWindow.print(); // Open the print dialog
-  };
-
   const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = () => setIsOpen(false);
@@ -386,7 +341,7 @@ const Invoice = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const businessRef = collection(userDocRef, "Businesses");
       await setDoc(doc(businessRef, registrationNumber), {
         ...newBusiness, // Store the entire business object
@@ -449,7 +404,7 @@ const Invoice = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const businessRef = collection(userDocRef, "Businesses");
       const businessDocRef = doc(businessRef, registrationNumber);
 
@@ -528,7 +483,7 @@ const Invoice = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins","saitraders@gmail.com");
       const customerRef = collection(userDocRef, "Customers");
       await setDoc(doc(customerRef, email), {
         ...newCustomer, // Store the entire customer object
@@ -570,7 +525,7 @@ const Invoice = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const customersRef = collection(userDocRef, "Customers");
         const customerSnapshot = await getDocs(customersRef);
         const customerList = customerSnapshot.docs.map((doc) => doc.data());
@@ -589,7 +544,7 @@ const Invoice = () => {
   // Fetch products from the database
   const fetchAndFilterProducts = async (searchText) => {
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const productsRef = collection(userDocRef, "Purchase");
       const productSnapshot = await getDocs(productsRef);
 
@@ -613,6 +568,212 @@ const Invoice = () => {
       console.error("Error fetching products:", error);
       return [];
     }
+  };
+  const handlePrint = () => {
+    const printContent = document.getElementById("invoiceContainers"); // Get the invoice container
+    const printWindow = window.open("", "", "height=700, width=1000"); // Open a new window
+
+    // Add styles for print
+    printWindow.document.write("<html><head><title>Print Invoice</title>");
+    printWindow.document.write("<style>");
+    printWindow.document.write(`
+      @page {
+        size: A4;
+        margin: 30mm;
+      }
+      body {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .invoice-container {
+        width: 100%;
+        padding: 30px;
+        box-sizing: border-box;
+      }
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        border-bottom: 2px solid #4c51bf;
+        padding-bottom: 20px;
+      }
+      .invoice-header .logo {
+        max-width: 150px;
+      }
+      .company-info {
+        text-align: right;
+        font-size: 14px;
+        color: #4c51bf;
+      }
+      .company-info .company-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4c51bf;
+      }
+      .invoice-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        background-color: #f7fafc;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      }
+      .invoice-details .left, .invoice-details .right {
+        width: 48%;
+      }
+      .invoice-details h3 {
+        margin-bottom: 10px;
+        color: #2b6cb0;
+      }
+      .invoice-details .left p, .invoice-details .right p {
+        margin: 6px 0;
+      }
+      .bill-to {
+        margin-bottom: 40px;
+      }
+      .bill-to h3 {
+        margin-bottom: 10px;
+        color: #2b6cb0;
+      }
+      .table-container {
+        width: 100%;
+        margin-bottom: 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      th, td {
+        padding: 15px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #4c51bf;
+        color: white;
+        font-weight: bold;
+      }
+      .totals {
+        display: flex;
+        justify-content: flex-end;
+        font-weight: bold;
+        margin-bottom: 30px;
+        width: 100%;
+      }
+      .totals .total, .totals .tax {
+        width: 150px;
+        padding: 12px;
+        margin-left: 10px;
+        background-color: #4c51bf;
+        color: white;
+        border-radius: 5px;
+      }
+      .footer {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 40px;
+        color: #4c51bf;
+      }
+      @media print {
+        .hidden-print {
+          display: none !important;
+        }
+        .invoice-container {
+          padding: 20mm;
+        }
+      }
+    `);
+    printWindow.document.write("</style></head><body>");
+
+    // Begin invoice content
+    printWindow.document.write("<div class='invoice-container'>");
+
+    // Header: Company Logo and Information
+    printWindow.document.write(`
+      <div class='invoice-header'>
+        <img src='../src/assets/svs logo.png' class='logo' alt='Company Logo' />
+        <div class='company-info'>
+          <div class='company-name'>Saravaviyyabi Sai Traders</div>
+          <div>Address: Cindhapalli ,Sattur</div>
+          <div>Phone: ++91-9944017017</div>
+          <div>Email: svstraders@gmail.com</div>
+          <div>GSTIN: 33AYRPS7034B1ZC</div>
+        </div>
+      </div>
+    `);
+
+    // Invoice details
+    printWindow.document.write(`
+      <div class='invoice-details'>
+        <div class='left'>
+          <h3>Invoice Number: INV-0118</h3>
+          <p><strong>Date:</strong> 07 Feb 2025</p>
+          <p><strong>Due Date:</strong> 15 Feb 2025</p>
+        </div>
+        <div class='right'>
+          <h3>Bill To:</h3>
+          <p><strong>Company Name:</strong> BZ India</p>
+          <p>Address: Building no 267, Muhiddinpur Dabarsi, Ghaziabad, Uttar Pradesh, 201002</p>
+          <p>GSTIN: 09AMGPB5411N2Z0</p>
+          <p>Place of Supply: Uttar Pradesh</p>
+        </div>
+      </div>
+    `);
+
+    // Products table
+    printWindow.document.write(`
+      <div class='table-container'>
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>HSN Code</th>
+              <th>Quantity</th>
+              <th>Rate</th>
+              <th>IGST (%)</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Titanium Powder</td>
+              <td>81082000</td>
+              <td>100</td>
+              <td>₹600.00</td>
+              <td>18%</td>
+              <td>₹60,000.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `);
+
+    // Tax and Total Calculation
+    printWindow.document.write(`
+      <div class='totals'>
+        <div class='tax'>IGST (18%): ₹10,800.00</div>
+        <div class='total'>Total: ₹70,800.00</div>
+      </div>
+    `);
+
+    // Notes and Footer
+    printWindow.document.write(`
+      <div class='footer'>
+        <p><strong>Notes:</strong> Please make payment after delivery.</p>
+        <p><strong>Terms & Conditions:</strong> Please make payment after delivery.</p>
+      </div>
+    `);
+
+    printWindow.document.write("</div>");
+    printWindow.document.close(); // Close the document for rendering
+    printWindow.print(); // Open the print dialog
   };
 
   // Handle the change in the description input field
@@ -670,78 +831,6 @@ const Invoice = () => {
 
   const [errorMessage, setErrorMessage] = useState(""); // Tracks the error message
 
-  // const handleActionConfirm = async () => {
-  //   // Ensure all required fields are defined or fall back to default values
-  //   const paymentStatus = isLightMode ? "Paid" : "Unpaid"; // Set payment status
-
-  //   const category2 = category || null;
-  //   const status2 = status || null;
-  //   const icst2 = icst || null;
-  //   const invoiceDate2 = invoiceDate || new Date();
-  //   const invoiceNumber2 = invoiceNumber || 0;
-  //   const billFrom2 = billFrom || {};
-  //   const billTo2 = billTo || {};
-  //   const products2 = products || [];
-  //   const shippingMethod2 = shippingMethod || '';
-  //   const paymentMethod2 = paymentMethod || '';
-
-  //   const dataToSave = {
-  //     paymentStatus,
-  //     invoiceDate: invoiceDate2,
-  //     invoiceNumber: invoiceNumber2,
-  //     billFrom: billFrom2,
-  //     billTo: billTo2,
-  //     products: products2,
-  //     shippingMethod: shippingMethod2,
-  //     paymentMethod: paymentMethod2,
-  //     taxDetails: {
-  //       CGST: category2,
-  //       SGST: status2,
-  //       IGST: icst2,
-  //     },
-  //     subtotal: calculateSubtotal().toFixed(2),
-  //     total: calculateTotal().toFixed(2),
-  //     createdAt: new Date(),
-  //   };
-
-  //   // Log the entire data object before saving to Firestore
-  //   console.log('Data to be saved:', dataToSave);
-
-  //   // Check if any values are undefined
-  //   for (const [key, value] of Object.entries(dataToSave)) {
-  //     if (value === undefined) {
-  //       console.error(`The field '${key}' is undefined!`);
-  //     }
-  //   }
-
-  //   try {
-  //     const userDocRef = doc(db, "admins", user.email);
-  //     const invoicesDocRef = doc(userDocRef, "Invoices", "paid unpaid");
-  //     const subCollectionName = paymentStatus === "Paid" ? "paid" : "unpaid";
-  //     const subCollectionRef = doc(
-  //       invoicesDocRef,
-  //       subCollectionName,
-  //       invoiceNumber2.toString()
-  //     );
-
-  //     // Save the data to Firestore
-  //     await setDoc(subCollectionRef, dataToSave);
-
-  //     Swal.fire({
-  //       icon: 'success',
-  //       title: 'Status Saved!',
-  //       text: `Status "${paymentStatus}" for Invoice No: ${invoiceNumber2} has been saved successfully!`,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error saving status to Firestore:", error);
-  //     Swal.fire({
-  //       icon: 'error',
-  //       title: 'Error!',
-  //       text: 'There was an error saving the status. Please try again.',
-  //     });
-  //   }
-  // };
-
   const handleActionConfirm = async () => {
     const dataToSave = {
       paymentStatus: isLightMode ? "Paid" : "Unpaid",
@@ -770,7 +859,7 @@ const Invoice = () => {
       const invoiceRef = doc(
         db,
         "admins",
-        user.email,
+       "saitraders@gmail.com",
         "Invoices",
         dataToSave.invoiceNumber.toString()
       );
@@ -792,16 +881,6 @@ const Invoice = () => {
     }
   };
 
-  // const fetchPaidInvoices = async () => {
-  //   const invoicesRef = collection(db, "admins", user.email, "Invoices");
-  //   const q = query(invoicesRef, where("paymentStatus", "==", "Paid"));
-
-  //   const querySnapshot = await getDocs(q);
-  //   querySnapshot.forEach((doc) => {
-  //     console.log(doc.id, "=>", doc.data());
-  //   });
-  // };
-
   return (
     <div className="p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 bg-gradient-to-br from-blue-100 to-indigo-100 min-h-screen w-full">
       <div
@@ -812,16 +891,26 @@ const Invoice = () => {
           Invoice Generator
         </h1>
         {/* Invoice Header */}
-        <div className="flex flex-col sm:flex-row justify-between mb-6">
-          <div className="w-full sm:w-1/3 mb-4 sm:mb-0">
-            <h2 className="text-xl font-semibold text-blue-900">
+        <div className="flex items-center justify-between mb-6">
+          {/* Logo Section */}
+          <div className="flex items-center justify-end w-1/3">
+            <img
+              src="../src/assets/svs logo.png" // Replace this with the path to your logo
+              alt="Logo"
+              className="w-30 h-30 object-contain" // Larger logo
+            />
+          </div>
+          {/* Invoice Details Section */}
+          <div className="w-2/3 text-blue-600 text-left">
+            <h3 className="text-2xl font-semibold text-blue-900 mb-2">
               Invoice Details
-            </h2>
-            <div className="text-blue-600">Invoice No: {invoiceNumber}</div>
-            <div className="text-blue-600">Date: {invoiceDate}</div>
+            </h3>
+            <div>Invoice No: {invoiceNumber}</div>
+            <div>Date: {invoiceDate}</div>
           </div>
 
           {/* Bill From and Bill To in the same row */}
+
           <div className="w-full sm:w-2/3 flex justify-between space-x-6">
             {/* Bill From */}
             <div className="w-full sm:w-1/2">
@@ -1095,8 +1184,7 @@ const Invoice = () => {
                   onChange={handleBusinessChange}
                   className=" print:hidden w-full px-4 py-2 border-2 border-indigo-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <p>Select Business</p>
-                  {/* <option >Select Business</option> */}
+                  <option value="#">Select Business</option>
                   {businessList.map((business) => (
                     <option key={business.id} value={business.id}>
                       {business.businessName}
@@ -1767,7 +1855,6 @@ const Invoice = () => {
             </div>
           )}
         </div>
-        {/* Invoice Footer */}
       </div>
     </div>
   );

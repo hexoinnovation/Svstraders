@@ -46,7 +46,7 @@ const AttendanceApp = () => {
         if (currentUser) {
           // Fetch employee details for assigning attendance
           const employeeQuery = query(
-            collection(db, "admins", currentUser.email, "Empdetails")
+            collection(db, "admins", "saitraders@gmail.com", "Empdetails")
           );
           const employeeSnapshot = await getDocs(employeeQuery);
           const fetchedEmployees = employeeSnapshot.docs.map((doc) => ({
@@ -59,7 +59,7 @@ const AttendanceApp = () => {
           const attendanceCollectionRef = collection(
             db,
             "admins",
-            currentUser.email,
+            "saitraders@gmail.com",
             "attendance"
           );
           const attendanceSnapshot = await getDocs(attendanceCollectionRef);
@@ -146,7 +146,7 @@ const AttendanceApp = () => {
         employeeEmail: selectedEmployee.email,
       };
 
-      const userDocRef = collection(db, "admins", user.email, "attendance");
+      const userDocRef = collection(db, "admins", "saitraders@gmail.com", "attendance");
 
       if (newAttendance.id) {
         // Update existing attendance

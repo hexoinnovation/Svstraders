@@ -40,6 +40,7 @@ import Profile from "./Components/profile";
 import Hrmdashboard from "./pages/hrmdashboard";
 import Invoicedashboard from "./pages/invoicedashboard";
 import Endproduct from "./pages/endproduct";
+import Rawmaterials from "./pages/rawmaterials";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -48,7 +49,8 @@ const App = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isUserLogin, setIsUserLogin] = useState(false);
   // Handle sign-up logic
   const handleSignup = async () => {
     try {
@@ -103,7 +105,15 @@ const App = () => {
   const handleMenuClick = () => {
     setSidebarVisible((prevState) => !prevState);
   };
-
+  const handleUserLogin = () => {
+    if (email === "saiemp@gmail.com" && password === "Hexo@123") {
+      setIsAuthenticated(true);
+      setErrorMessage(""); // Clear errors
+      alert("User login successful!");
+    } else {
+      setErrorMessage("Invalid email or password. Please try again.");
+    }
+  };
   return (
     <Router>
       <AuthProvider>
@@ -126,6 +136,12 @@ const App = () => {
               <Route
                 path="/purchase"
                 element={isAuthenticated ? <Purchase /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/rawmaterials"
+                element={
+                  isAuthenticated ? <Rawmaterials /> : <Navigate to="/" />
+                }
               />
               <Route
                 path="/invoice"
@@ -225,9 +241,9 @@ const App = () => {
           {!isAuthenticated && showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 via-gray-200 to-blue-900 bg-opacity-90 z-50 animate-fadeIn">
               <div className="bg-blue-900 p-10 rounded-2xl w-96 shadow-lg transform transition-all duration-300 hover:shadow-2xl">
-                <h2 className="text-3xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-100 via-gray-100 to-gray-100">
-                  {isSignup ? "Admin Sign Up" : "Admin Login"}
-                </h2>
+               <h2 className="text-3xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-100 via-gray-100 to-gray-100">
+  {isUserLogin ? "User Login" : isSignup ? "Admin Sign Up" : "Admin Login"}
+</h2>
 
                 {/* Login or Signup Form */}
                 <form
@@ -302,7 +318,23 @@ const App = () => {
                     </>
                   )}
                 </p>
+                
+              <p className="text-sm mt-6 text-center text-gray-100">
+  If you are a User?{" "}
+  <button
+    onClick={() => {
+      setEmail("saiemp@gmail.com");
+      setPassword("Hexo@123");
+      setIsUserLogin(true); // Set login type to User
+    }}
+    className="text-yellow-500 font-semibold relative group"
+  >
+    Login
+    <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-indigo-500 transition-all duration-300 group-hover:w-full"></span>
+  </button>
+</p>
               </div>
+           
             </div>
           )}
         </div>

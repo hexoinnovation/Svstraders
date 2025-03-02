@@ -131,7 +131,7 @@ const App = () => {
             photoURL = newEmployee.photo;
         }
 
-        const userDocRef = collection(db, "admins", user.email, "Empdetails");
+        const userDocRef = collection(db, "admins", "saitraders@gmail.com", "Empdetails");
 
         // Check if an employee with the same contact number already exists
         const querySnapshot = await getDocs(
@@ -250,7 +250,7 @@ const App = () => {
 
     if (result.isConfirmed) {
       try {
-        const userDocRef = collection(db, "admins", user.email, "Empdetails");
+        const userDocRef = collection(db, "admins", "saitraders@gmail.com", "Empdetails");
         const employeeDocRef = doc(userDocRef, employeeId);
 
         await deleteDoc(employeeDocRef);

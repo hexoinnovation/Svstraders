@@ -51,8 +51,8 @@ const AttendanceApp = (currentUser) => {
         setUser(currentUser);
   
         if (currentUser) {
-          // Fetch Employees
-          const employeeQuery = collection(db, "admins", currentUser.email, "Empdetails");
+          // Fetch Employeescom
+          const employeeQuery = collection(db, "admins", "saitraders@gmail.com", "Empdetails");
           const employeeSnapshot = await getDocs(employeeQuery);
           let fetchedEmployees = [];
           if (!employeeSnapshot.empty) {
@@ -65,7 +65,7 @@ const AttendanceApp = (currentUser) => {
           }
   
           // Fetch Attendance
-          const attendanceQuery = collection(db, "admins", currentUser.email, "Attendance");
+          const attendanceQuery = collection(db, "admins", "saitraders@gmail.com", "Attendance");
           const attendanceSnapshot = await getDocs(attendanceQuery);
           let latestAttendance = [];
           if (!attendanceSnapshot.empty) {
@@ -174,7 +174,7 @@ const AttendanceApp = (currentUser) => {
         return;
     }
 
-    const attendanceRef = collection(db, "admins", user.email, "Attendance");
+    const attendanceRef = collection(db, "admins", "saitraders@gmail.com", "Attendance");
 
     try {
         const attendanceData = {};

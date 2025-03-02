@@ -46,7 +46,7 @@ const CustomerDetails = () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "admins", user.email);
+        const userDocRef = doc(db, "admins", "saitraders@gmail.com");
         const customersRef = collection(userDocRef, "Customers");
         const customerSnapshot = await getDocs(customersRef);
         const customerList = customerSnapshot.docs.map((doc) => doc.data());
@@ -95,7 +95,7 @@ const CustomerDetails = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const customerRef = collection(userDocRef, "Customers");
       await setDoc(doc(customerRef, email), {
         ...newCustomer, // Store the entire customer object
@@ -139,7 +139,7 @@ const CustomerDetails = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const customerDoc = doc(db, "admins", user.email, "Customers", email);
+      const customerDoc = doc(db, "admins", "saitraders@gmail.com", "Customers", email);
       await deleteDoc(customerDoc);
 
       setCustomers((prev) =>
@@ -190,7 +190,7 @@ const CustomerDetails = () => {
     }
 
     try {
-      const userDocRef = doc(db, "admins", user.email);
+      const userDocRef = doc(db, "admins", "saitraders@gmail.com");
       const customerRef = collection(userDocRef, "Customers");
       const customerDocRef = doc(customerRef, email);
 

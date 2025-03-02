@@ -48,7 +48,7 @@ const ViewAllInvoice = () => {
 
   const fetchInvoices = async () => {
     try {
-      const invoicesRef = collection(db, "admins", user.email, "Invoices");
+      const invoicesRef = collection(db, "admins", "saitraders@gmail.com", "Invoices");
       const querySnapshot = await getDocs(invoicesRef);
 
       const invoices = querySnapshot.docs.map((doc) => ({
@@ -166,7 +166,7 @@ const ViewAllInvoice = () => {
         const invoiceDocRef = doc(
           db,
           "admins",
-          user.email,
+          "saitraders@gmail.com",
           "Invoices",
           invoiceNumber.toString()
         );
@@ -196,7 +196,7 @@ const ViewAllInvoice = () => {
       const invoiceRef = doc(
         db,
         "admins",
-        auth.currentUser.email,
+        "saitraders@gmail.com",
         "Invoices",
         invoiceNumber.toString()
       );
